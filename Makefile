@@ -6,7 +6,6 @@ all: test
 clean:
 	rm -rf bin
 	rm -rf tests/*_easyjson.go
-	rm -rf benchmark/*_easyjson.go
 
 build:
 	go build -ldflags="-s -w -X 'main.Version=$(VERSION)' -X 'main.Commit=$(COMMIT)'" -o ./bin/easyjson ./easyjson
@@ -54,7 +53,6 @@ generate: build
 		./tests/text_marshaler.go
 	bin/easyjson -snake_case ./tests/snake.go
 	bin/easyjson -omit_empty ./tests/omitempty.go
-	bin/easyjson -build_tags=use_easyjson -disable_members_unescape ./benchmark/data.go
 	bin/easyjson -disallow_unknown_fields ./tests/disallow_unknown.go
 	bin/easyjson -disable_members_unescape ./tests/members_unescaped.go
 
@@ -64,14 +62,7 @@ test: generate
 		./jlexer \
 		./gen \
 		./buffer
-	cd benchmark && go test -benchmem -tags use_easyjson -bench .
 	golint -set_exit_status ./tests/*_easyjson.go
-
-bench-other: generate
-	cd benchmark && make
-
-bench-python:
-	benchmark/ujson.sh
 
 
 .PHONY: clean generate test build
